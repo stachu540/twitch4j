@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE suppressions PUBLIC
+		"-//Checkstyle//DTD SuppressionXpathFilter Experimental Configuration 1.2//EN"
+		"https://checkstyle.org/dtds/suppressions_1_2_xpath_experimental.dtd">
+
+<suppressions>
+	<suppress-xpath checks="HideUtilityClassConstructor"
+					query="//*[MODIFIERS//*[@text='UtilityClass' or @text='NoArgsConstructor']]/descendant-or-self::node()"/>
+  <suppress-xpath checks="VisibilityModifier"
+                  query="//*[MODIFIERS//*[@text='Value' or @text='Data']]/descendant-or-self::node()"/>
+  <suppress-xpath checks="HiddenField"
+                  query="//*[MODIFIERS//*[@text='Value' or @text='Data' or @text='Getter' or @text='Setter']]/descendant-or-self::node()"/>
+</suppressions>

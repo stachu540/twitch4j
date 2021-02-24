@@ -3,7 +3,8 @@ on: [ push, pull_request ]
 
 env:
   CI: true
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   test:
@@ -11,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        jvm: [ 8, 11, 14, 15 ]
+        jvm: [ 11, 14, 15 ]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/cache@v2
@@ -42,7 +43,7 @@ jobs:
           restore-keys: JDK8-gradle-
       - uses: actions/setup-java@v1
         with:
-          java-version: 8
+          java-version: 11
       - uses: actions/setup-node@v1
       - run: chmod +x ./gradlew
       - uses: cycjimmy/semantic-release-action@v2

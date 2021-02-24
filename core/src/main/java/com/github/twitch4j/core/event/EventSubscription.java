@@ -1,41 +1,67 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2021 Philipp Heuer
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package com.github.twitch4j.core.event;
-
-import lombok.AccessLevel;
-import lombok.Getter;
 
 import java.util.Map;
 import java.util.function.Consumer;
+import lombok.AccessLevel;
+import lombok.Getter;
 
 @Getter
 public final class EventSubscription<E extends Event> implements EventDisposable {
-    private final String id;
-    private final Class<E> eventType;
-    private final Consumer<E> consumer;
-    @Getter(AccessLevel.NONE)
-    private final EventDisposable disposable;
+  private final String id;
+  private final Class<E> eventType;
+  private final Consumer<E> consumer;
+  @Getter(AccessLevel.NONE)
+  private final EventDisposable disposable;
 
-    private final Map<String, EventSubscription<?>> activeSubscriptions;
+  private final Map<String, EventSubscription<?>> activeSubscriptions;
 
-    public EventSubscription(EventDisposable disposable, String id, Class<E> eventType, Consumer<E> consumer, Map<String, EventSubscription<?>> activeSubscriptions) {
-        this.disposable = disposable;
-        this.id = id;
-        this.eventType = eventType;
-        this.consumer = consumer;
-        this.activeSubscriptions = activeSubscriptions;
+  public EventSubscription(
+    final EventDisposable disposable, final String id,
+    final Class<E> eventType, final Consumer<E> consumer,
+    final Map<String, EventSubscription<?>> activeSubscriptions
+  ) {
+    this.disposable = disposable;
+    this.id = id;
+    this.eventType = eventType;
+    this.consumer = consumer;
+    this.activeSubscriptions = activeSubscriptions;
 
-        activeSubscriptions.put(id, this);
+    activeSubscriptions.put(id, this);
+  }
+
+  @Override
+  public void dispose() {
+    if (!disposable.isDisposed()) {
+      disposable.dispose();
+      activeSubscriptions.remove(id);
     }
+  }
 
-    @Override
-    public void dispose() {
-        if (!disposable.isDisposed()) {
-            disposable.dispose();
-            activeSubscriptions.remove(id);
-        }
-    }
-
-    @Override
-    public boolean isDisposed() {
-        return disposable.isDisposed();
-    }
+  @Override
+  public boolean isDisposed() {
+    return disposable.isDisposed();
+  }
 }

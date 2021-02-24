@@ -1,17 +1,39 @@
 plugins {
-    signing
-    `java-library`
-    `maven-publish`
-    id("io.freefair.lombok") version "5.3.0"
-    id("com.github.johnrengelman.shadow") version "6.1.0"
+	signing
+	`java-library`
+	`maven-publish`
+	id("io.freefair.lombok") version "5.3.0"
+	id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
 allprojects {
-    repositories {
-        mavenCentral()
+	repositories {
+		mavenCentral()
 		mavenLocal()
 		jcenter()
-    }
+	}
+
+	pluginManager.withPlugin("java-library") {
+		val docletConfig = configurations.create("doclet")
+
+		dependencies {
+			add("doclet", "org.asciidoctor:asciidoclet:1.5.6")
+		}
+
+		tasks.withType<Javadoc> {
+			options {
+				this as StandardJavadocDocletOptions
+
+				docletpath = docletConfig.files.toList()
+				doclet = "org.asciidoctor.Asciidoclet"
+				overview = "${rootDir}/config/javadoc/overview.adoc"
+				tags("unofficial:a:Unofficial:")
+				addStringsOption("-attribute", ",").value = listOf(
+					"name=${artifactId}", "version=${version}"
+				)
+			}
+		}
+	}
 
 	tasks {
 		withType<JavaCompile> {
@@ -30,15 +52,15 @@ allprojects {
 }
 
 subprojects {
-    apply(plugin = "signing")
-    apply(plugin = "maven-publish")
+	apply(plugin = "signing")
 	apply(plugin = "java-library")
+	apply(plugin = "maven-publish")
 	apply(plugin = "io.freefair.lombok")
 	apply(plugin = "com.github.johnrengelman.shadow")
 
 	// Source Compatibility
 	java {
-		sourceCompatibility = JavaVersion.VERSION_11 // source code to 11
+		sourceCompatibility = JavaVersion.VERSION_1_8 // source code to 11
 		targetCompatibility = JavaVersion.VERSION_1_8 // compilation to 1.8
 		// TODO modularity for Jigsaw: https://github.com/twitch4j/twitch4j/issues/218
 //		modularity.apply {
@@ -78,23 +100,25 @@ subprojects {
 		// Test
 		testImplementation(platform("org.junit:junit-bom:5.7.0"))
 		testImplementation("org.junit.jupiter:junit-jupiter")
+		testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 		testImplementation("ch.qos.logback:logback-classic:1.2.3")
-
+		testImplementation("org.mockito:mockito-core:3.8.0")
+		testImplementation("org.mockito:mockito-junit-jupiter:3.8.0")
 	}
 
-    val maven by publishing.publications.creating(MavenPublication::class) {
-        from(components["java"])
-        artifactId = project.artifactId
+	val maven by publishing.publications.creating(MavenPublication::class) {
+		from(components["java"])
+		artifactId = project.artifactId
 		pom {
 			packaging = "jar"
 		}
-    }
+	}
 
-    signing {
-        sign(maven)
-    }
+	signing {
+		sign(maven)
+	}
 
-    publishing {
+	publishing {
 		repositories {
 			maven {
 				val releaseUri = "https://oss.sonatype.org/content/repositories/releases"
@@ -107,7 +131,7 @@ subprojects {
 				}
 			}
 		}
-    }
+	}
 
 	tasks {
 		val delombok by getting(io.freefair.gradle.plugins.lombok.tasks.Delombok::class)

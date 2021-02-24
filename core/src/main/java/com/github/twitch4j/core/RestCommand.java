@@ -1,3 +1,26 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2021 Philipp Heuer
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package com.github.twitch4j.core;
 
 import java.util.concurrent.CompletableFuture;
@@ -5,25 +28,25 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public interface RestCommand<T> extends TwitchObject {
-    RestCommand<T> doOnSuccess(Consumer<T> success);
+  RestCommand<T> doOnSuccess(Consumer<T> success);
 
-    RestCommand<T> doOnError(Consumer<Throwable> error);
+  RestCommand<T> doOnError(Consumer<Throwable> error);
 
-    <X extends Throwable> RestCommand<T> doOnError(Class<X> type, Consumer<X> error);
+  <X extends Throwable> RestCommand<T> doOnError(Class<X> type, Consumer<X> error);
 
-    RestCommand<T> doOnComplete(Runnable completed);
+  RestCommand<T> doOnComplete(Runnable completed);
 
-    <R> RestCommand<R> map(Function<T, R> mapper);
+  <R> RestCommand<R> map(Function<T, R> mapper);
 
-    <R> RestCommand<R> flatMap(Function<T, RestCommand<R>> mapper);
+  <R> RestCommand<R> flatMap(Function<T, RestCommand<R>> mapper);
 
-    T execute() throws Throwable;
+  T execute() throws Exception;
 
-    void enqueue(Consumer<T> result, Consumer<Throwable> error);
+  void enqueue(Consumer<T> result, Consumer<Exception> error);
 
-    void enqueue(Consumer<T> result);
+  void enqueue(Consumer<T> result);
 
-    void enqueue();
+  void enqueue();
 
-    CompletableFuture<T> complete();
+  CompletableFuture<T> complete();
 }

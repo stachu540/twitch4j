@@ -26,7 +26,9 @@ open class Github : Plugin<Project> {
 				Git.shutdown()
 			}
 
-			val github = GitHubBuilder().withConnector(OkHttpConnector(OkHttpClient())).build()
+			val github = GitHubBuilder.fromEnvironment()
+				.withConnector(OkHttpConnector(OkHttpClient()))
+				.build()
 			var repository = github.getRepository(slug)
 			while (repository.isFork) {
 				repository = repository.parent
@@ -37,7 +39,12 @@ open class Github : Plugin<Project> {
 				.toSet() else setOf(owner as GHUser)
 
 			val contributors: Set<GHUser> = repository.listContributors().toSet()
-				.filter { it.login.toLowerCase() !in members.map { it.login.toLowerCase() } && !it.login.startsWith("dependabot", true)}.toSet()
+				.filter {
+					it.login.toLowerCase() !in members.map { it.login.toLowerCase() } && !it.login.startsWith(
+						"dependabot",
+						true
+					)
+				}.toSet()
 
 			project.allprojects {
 				pluginManager.withPlugin("maven-publish") {

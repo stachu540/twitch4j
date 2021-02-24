@@ -62,3 +62,7 @@ tmp/*
 
 # Lombok
 lombok.config
+
+# Requried files
+!config/checkstyle/
+!config/javadoc/
